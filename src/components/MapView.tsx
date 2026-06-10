@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { SAPPORO_CITY_AREAS } from "@/lib/areas";
+import { getCategoryLabel } from "@/lib/scoring/reasons";
 import {
   ALL_TIME_SLOTS,
   TIME_SLOT_SHORT_LABELS,
@@ -108,12 +109,15 @@ export function MapView() {
                 }}
               >
                 <Popup>
-                  <div className="text-sm">
+                  <div className="max-w-xs text-sm">
                     <p className="font-bold">{rec.area.name}</p>
-                    <p>スコア: {rec.score}</p>
-                    <ul>
-                      {rec.reasons.map((r) => (
-                        <li key={r}>・{r}</li>
+                    <p className="mb-2 text-slate-500">スコア: {rec.score}</p>
+                    <p className="mb-1 text-xs font-semibold text-slate-500">需要パターン</p>
+                    <ul className="space-y-1">
+                      {rec.reasonDetails.slice(0, 4).map((r) => (
+                        <li key={r.text} className="text-xs text-slate-700">
+                          <span className="font-medium">[{getCategoryLabel(r.category)}]</span> {r.text}
+                        </li>
                       ))}
                     </ul>
                   </div>

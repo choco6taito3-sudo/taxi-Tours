@@ -96,9 +96,11 @@ export function startShift(date: string, startedAt: string): WorkShift {
   const existing = getShiftByDate(date);
   if (existing) {
     getDb()
-      .prepare("UPDATE work_shifts SET started_at = ? WHERE id = ?")
+      .prepare(
+        "UPDATE work_shifts SET started_at = ?, ended_at = NULL WHERE id = ?",
+      )
       .run(startedAt, existing.id);
-    return { ...existing, startedAt };
+    return { ...existing, startedAt, endedAt: null };
   }
 
   const result = getDb()

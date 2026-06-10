@@ -16,6 +16,7 @@ import {
 import { ja } from "date-fns/locale";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ReasonList } from "@/components/ReasonList";
 import type { DailyWeather, DayRecommendation } from "@/lib/types";
 
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
@@ -140,29 +141,55 @@ export function CalendarView() {
         {loading ? (
           <p className="text-sm text-slate-500">読み込み中...</p>
         ) : detail ? (
-          <div className="space-y-3">
-            <p className="text-sm text-slate-600">{detail.summary}</p>
+          <div className="space-y-4">
+            {detail.demandOverview && (
+              <div className="rounded-lg bg-slate-50 p-3">
+                <p className="mb-1 text-xs font-semibold text-slate-500">需要概要</p>
+                {detail.demandOverview.split("\n").map((line) => (
+                  <p key={line} className="text-sm text-slate-700">
+                    {line}
+                  </p>
+                ))}
+              </div>
+            )}
             {detail.events.length > 0 && (
               <div>
                 <p className="mb-1 text-sm font-semibold">イベント</p>
-                <ul className="space-y-1">
+                <ul className="space-y-2">
                   {detail.events.map((e) => (
-                    <li key={e.id} className="text-sm text-violet-700">
-                      ・{e.title}
+                    <li key={e.id} className="rounded-lg bg-violet-50 p-2 text-sm text-violet-800">
+                      <p className="font-medium">{e.title}</p>
+                      <p className="text-xs text-violet-600">
+                        想定{e.estimatedAttendance.toLocaleString()}人
+                        {e.peakHours?.length
+                          ? ` / ピーク${e.peakHours[0]}〜${e.peakHours[e.peakHours.length - 1]}時`
+                          : ""}
+                      </p>
                     </li>
                   ))}
                 </ul>
               </div>
             )}
             <div>
-              <p className="mb-1 text-sm font-semibold">狙い目エリア</p>
-              <ul className="space-y-1">
+              <p className="mb-2 text-sm font-semibold">狙い目エリアと需要パターン</p>
+              <div className="space-y-3">
                 {detail.topAreas.map((a, i) => (
-                  <li key={a.area.id} className="text-sm">
-                    {i + 1}. {a.area.name}（スコア {a.score}）
-                  </li>
+                  <div
+                    key={a.area.id}
+                    className="rounded-lg border border-slate-100 bg-slate-50 p-3"
+                  >
+                    <p className="text-sm font-bold">
+                      {i + 1}. {a.area.name}
+                      <span className="ml-2 font-normal text-slate-500">
+                        スコア {a.score}
+                      </span>
+                    </p>
+                    <div className="mt-2">
+                      <ReasonList reasons={a.reasonDetails} compact />
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
         ) : null}

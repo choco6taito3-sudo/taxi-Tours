@@ -1,15 +1,15 @@
-import { format } from "date-fns";
 import { NextResponse } from "next/server";
 import { fetchEventsForDate } from "@/lib/fetchers/events";
 import { fetchWeatherForecast } from "@/lib/fetchers/weather";
 import { getRecommendationsForDay } from "@/lib/scoring/engine";
 import type { DayRecommendation } from "@/lib/types";
+import { getJSTDateString, getJSTHour } from "@/lib/utils/datetime";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const date = searchParams.get("date") ?? format(new Date(), "yyyy-MM-dd");
+  const date = searchParams.get("date") ?? getJSTDateString();
 
   try {
     const [{ daily }, events] = await Promise.all([
@@ -22,10 +22,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "天気データが見つかりません" }, { status: 404 });
     }
 
-    const isToday = date === format(new Date(), "yyyy-MM-dd");
-    const currentHour = isToday ? new Date().getHours() : undefined;
+    const isToday = date === getJSTDateString();
+    const currentHour = isToday ? getJSTHour() : undefined;
 
-    const { topAreas, timeSlotAreas, currentSlot, summary } =
+    const { topAreas, timeSlotAreas, currentSlot, summary, demandOverview } =
       getRecommendationsForDay(date, weather, events, currentHour);
 
     const result: DayRecommendation = {
@@ -36,6 +36,7 @@ export async function GET(request: Request) {
       timeSlotAreas,
       currentSlot,
       summary,
+      demandOverview,
     };
 
     return NextResponse.json(result);

@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ja } from "date-fns/locale";
 import { AreaScoreCard } from "@/components/AreaScoreCard";
 import { EventCard } from "@/components/EventCard";
@@ -14,12 +14,14 @@ import {
   isWithinOperatingHours,
 } from "@/lib/operating-hours";
 import { getRecommendationsForDay } from "@/lib/scoring/engine";
-import type { TimeSlot } from "@/lib/types";
+import { getJSTDateString, getJSTHour } from "@/lib/utils/datetime";
+import { ReasonList } from "@/components/ReasonList";
+import type { AreaRecommendation, TimeSlot } from "@/lib/types";
 
 export default async function HomePage() {
   const now = new Date();
-  const today = format(now, "yyyy-MM-dd");
-  const currentHour = now.getHours();
+  const today = getJSTDateString(now);
+  const currentHour = getJSTHour(now);
   const currentSlot = getCurrentTimeSlot(currentHour);
   const inShift = isWithinOperatingHours(currentHour);
 
@@ -29,7 +31,7 @@ export default async function HomePage() {
   ]);
 
   const weather = daily.find((d) => d.date === today) ?? daily[0];
-  const { timeSlotAreas, summary } = getRecommendationsForDay(
+  const { timeSlotAreas, summary, demandOverview } = getRecommendationsForDay(
     today,
     weather,
     events,
@@ -46,16 +48,25 @@ export default async function HomePage() {
         <p className="text-sm text-amber-700">札幌市内タクシー向け</p>
         <h1 className="text-2xl font-bold">今日のブリーフィング</h1>
         <p className="text-sm text-slate-500">
-          {format(now, "yyyy年M月d日(E)", { locale: ja })} / 稼働{" "}
-          {getOperatingHoursLabel()}
+          {format(parseISO(today), "yyyy年M月d日(E)", { locale: ja })} / 稼働{" "}
+          {getOperatingHoursLabel()}（日本時間）
         </p>
       </header>
 
       <WeatherBadge weather={weather} />
 
       <section className="rounded-2xl bg-amber-500 p-4 text-white">
-        <p className="text-sm font-medium opacity-90">本日の提案</p>
-        <p className="mt-1 text-base leading-relaxed">{summary}</p>
+        <p className="text-sm font-medium opacity-90">本日の需要概要</p>
+        <div className="mt-2 space-y-1 text-sm leading-relaxed opacity-95">
+          {demandOverview.split("\n").map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-4">
+        <p className="text-sm font-semibold text-slate-700">本日の提案</p>
+        <p className="mt-1 text-sm leading-relaxed text-slate-600">{summary}</p>
       </section>
 
       {!inShift && (
@@ -125,9 +136,11 @@ function TimeSlotSection({
   isCurrent,
 }: {
   slot: TimeSlot;
-  areas: { area: { id: string; name: string }; score: number }[];
+  areas: AreaRecommendation[];
   isCurrent: boolean;
 }) {
+  const top = areas[0];
+
   return (
     <div
       className={`rounded-xl p-3 ${
@@ -142,7 +155,7 @@ function TimeSlotSection({
           </span>
         )}
       </h3>
-      <ol className="space-y-1 text-sm text-slate-700">
+      <ol className="mb-2 space-y-1 text-sm text-slate-700">
         {areas.map((a, i) => (
           <li key={a.area.id}>
             {i + 1}. {a.area.name}
@@ -150,6 +163,14 @@ function TimeSlotSection({
           </li>
         ))}
       </ol>
+      {top && (
+        <div className="border-t border-slate-200 pt-2">
+          <p className="mb-1 text-xs font-semibold text-slate-500">
+            1位 {top.area.name} の需要パターン
+          </p>
+          <ReasonList reasons={top.reasonDetails} compact />
+        </div>
+      )}
     </div>
   );
 }

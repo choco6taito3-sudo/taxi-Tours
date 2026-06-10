@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { NextResponse } from "next/server";
 import {
   endShift,
@@ -6,6 +5,7 @@ import {
   getShiftHistory,
   startShift,
 } from "@/lib/db/database";
+import { getJSTDateString, getJSTNowISO } from "@/lib/utils/datetime";
 
 export const runtime = "nodejs";
 
@@ -31,10 +31,14 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as { action: "start" | "end"; date?: string };
-    const date = body.date ?? format(new Date(), "yyyy-MM-dd");
-    const now = new Date().toISOString();
+    const date = body.date ?? getJSTDateString();
+    const now = getJSTNowISO();
 
     if (body.action === "start") {
+      const existing = getShiftByDate(date);
+      if (existing?.startedAt && !existing.endedAt) {
+        return NextResponse.json({ shift: existing });
+      }
       const shift = startShift(date, now);
       return NextResponse.json({ shift });
     }

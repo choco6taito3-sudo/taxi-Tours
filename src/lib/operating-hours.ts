@@ -1,4 +1,5 @@
 import type { TimeSlot } from "./types";
+import { getJSTHour } from "./utils/datetime";
 
 /** 稼働時間 8:00〜21:00 */
 export const SHIFT_START_HOUR = 8;
@@ -36,7 +37,7 @@ export function isWithinOperatingHours(hour: number): boolean {
   return hour >= SHIFT_START_HOUR && hour <= SHIFT_END_HOUR;
 }
 
-export function getCurrentTimeSlot(hour = new Date().getHours()): TimeSlot | null {
+export function getCurrentTimeSlot(hour = getJSTHour()): TimeSlot | null {
   if (hour < SHIFT_START_HOUR || hour > SHIFT_END_HOUR) return null;
   if (hour < 11) return "morning";
   if (hour < 14) return "noon";

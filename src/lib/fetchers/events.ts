@@ -42,6 +42,7 @@ export function getRecurringEventsForDate(dateStr: string): Event[] {
       lng: t.lng,
       areaId: t.areaId,
       estimatedAttendance: t.estimatedAttendance,
+      peakHours: t.peakHours,
       source: "recurring",
     }),
   );

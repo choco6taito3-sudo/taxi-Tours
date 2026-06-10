@@ -56,7 +56,21 @@ export interface Event {
   lng: number;
   areaId?: string;
   estimatedAttendance: number;
+  peakHours?: number[];
   source: string;
+}
+
+export type DemandReasonCategory =
+  | "weather"
+  | "event"
+  | "timeslot"
+  | "weekday"
+  | "season"
+  | "area";
+
+export interface DemandReason {
+  category: DemandReasonCategory;
+  text: string;
 }
 
 export interface DailyWeather {
@@ -84,6 +98,7 @@ export interface AreaRecommendation {
   score: number;
   level: "high" | "medium" | "low";
   reasons: string[];
+  reasonDetails: DemandReason[];
 }
 
 export interface DayRecommendation {
@@ -94,6 +109,7 @@ export interface DayRecommendation {
   timeSlotAreas: Record<TimeSlot, AreaRecommendation[]>;
   currentSlot?: TimeSlot | null;
   summary: string;
+  demandOverview?: string;
 }
 
 export interface WorkShift {

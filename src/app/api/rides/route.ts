@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { NextResponse } from "next/server";
 import { isSapporoCityArea } from "@/lib/areas";
 import {
@@ -10,12 +9,13 @@ import {
 } from "@/lib/db/database";
 import { fetchEventsForDate } from "@/lib/fetchers/events";
 import { fetchCurrentWeatherSnapshot } from "@/lib/fetchers/weather";
+import { getJSTDateString, getJSTNowISO } from "@/lib/utils/datetime";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const date = searchParams.get("date") ?? format(new Date(), "yyyy-MM-dd");
+  const date = searchParams.get("date") ?? getJSTDateString();
 
   try {
     const rides = getRidesForDate(date);
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       rideId?: number;
     };
 
-    const date = body.date ?? format(new Date(), "yyyy-MM-dd");
+    const date = body.date ?? getJSTDateString();
     const shift = getShiftByDate(date);
     const [weather, events] = await Promise.all([
       fetchCurrentWeatherSnapshot(),
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     const context = {
       weather,
       events,
-      recordedAt: new Date().toISOString(),
+      recordedAt: getJSTNowISO(),
     };
 
     if (body.action === "pickup") {
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       }
       const ride = createRideLog({
         shiftId: shift?.id ?? null,
-        pickedUpAt: new Date().toISOString(),
+        pickedUpAt: getJSTNowISO(),
         pickupAreaId: body.pickupAreaId ?? null,
         pickupText: body.pickupText ?? null,
         weatherJson: JSON.stringify(context),
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         );
       }
       const ride = updateRideDropoff(body.rideId, {
-        droppedOffAt: new Date().toISOString(),
+        droppedOffAt: getJSTNowISO(),
         dropoffAreaId: body.dropoffAreaId ?? null,
         dropoffText: body.dropoffText ?? null,
         fareAmount: body.fareAmount ?? null,

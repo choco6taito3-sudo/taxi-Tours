@@ -1,3 +1,4 @@
+import { ReasonList } from "@/components/ReasonList";
 import type { AreaRecommendation } from "@/lib/types";
 
 const LEVEL_STYLES = {
@@ -19,12 +20,10 @@ export function AreaScoreCard({
   recommendation: AreaRecommendation;
   rank?: number;
 }) {
-  const { area, score, level, reasons } = recommendation;
+  const { area, score, level, reasonDetails } = recommendation;
 
   return (
-    <div
-      className={`rounded-2xl border-2 p-4 ${LEVEL_STYLES[level]}`}
-    >
+    <div className={`rounded-2xl border-2 p-4 ${LEVEL_STYLES[level]}`}>
       <div className="flex items-start justify-between gap-2">
         <div>
           {rank && (
@@ -37,13 +36,10 @@ export function AreaScoreCard({
           <p className="text-xs text-slate-500">需要{LEVEL_LABELS[level]}</p>
         </div>
       </div>
-      <ul className="mt-2 space-y-1">
-        {reasons.map((reason) => (
-          <li key={reason} className="text-sm text-slate-600">
-            ・{reason}
-          </li>
-        ))}
-      </ul>
+      <div className="mt-3">
+        <p className="mb-1.5 text-xs font-semibold text-slate-500">需要パターン</p>
+        <ReasonList reasons={reasonDetails} />
+      </div>
     </div>
   );
 }
