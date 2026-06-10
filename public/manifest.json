@@ -1,0 +1,12 @@
+{
+  "name": "札幌タクシー売上アップツール",
+  "short_name": "タクシー売上UP",
+  "description": "天気・イベント連動の売上提案と稼働記録（札幌市）",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait",
+  "lang": "ja",
+  "icons": []
+}
