@@ -45,9 +45,9 @@ export default async function HomePage() {
   return (
     <div className="space-y-5">
       <header>
-        <p className="text-sm text-amber-700">札幌市内タクシー向け</p>
-        <h1 className="text-2xl font-bold">今日のブリーフィング</h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-accent-text">札幌市内タクシー向け</p>
+        <h1 className="text-2xl font-bold text-[var(--foreground)]">今日のブリーフィング</h1>
+        <p className="text-sm text-muted">
           {format(parseISO(today), "yyyy年M月d日(E)", { locale: ja })} / 稼働{" "}
           {getOperatingHoursLabel()}（日本時間）
         </p>
@@ -55,23 +55,23 @@ export default async function HomePage() {
 
       <WeatherBadge weather={weather} />
 
-      <section className="rounded-2xl bg-amber-500 p-4 text-white">
-        <p className="text-sm font-medium opacity-90">本日の需要概要</p>
-        <div className="mt-2 space-y-1 text-sm leading-relaxed opacity-95">
+      <section className="rounded-2xl bg-accent-soft p-4 text-accent-text">
+        <p className="text-sm font-medium">本日の需要概要</p>
+        <div className="mt-2 space-y-1 text-sm leading-relaxed text-[var(--foreground-muted)]">
           {demandOverview.split("\n").map((line) => (
             <p key={line}>{line}</p>
           ))}
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4">
-        <p className="text-sm font-semibold text-slate-700">本日の提案</p>
-        <p className="mt-1 text-sm leading-relaxed text-slate-600">{summary}</p>
+      <section className="rounded-2xl border border-border-soft bg-surface-elevated p-4">
+        <p className="text-sm font-semibold text-[var(--foreground)]">本日の提案</p>
+        <p className="mt-1 text-sm leading-relaxed text-muted">{summary}</p>
       </section>
 
       {!inShift && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-4">
-          <p className="text-sm text-slate-600">
+        <section className="rounded-2xl border border-border-soft bg-surface-elevated p-4">
+          <p className="text-sm text-muted">
             現在は稼働時間外です（8:00〜21:00）。以下は本日の時間帯別プランです。
           </p>
         </section>
@@ -91,7 +91,7 @@ export default async function HomePage() {
               />
             ))}
           </div>
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs text-subtle">
             札幌市内{SAPPORO_CITY_AREAS.length}
             エリアからスコア上位を表示（主要名所以外の住宅街・区画も含む）
           </p>
@@ -123,7 +123,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      <p className="text-center text-xs text-slate-400">
+      <p className="text-center text-xs text-subtle">
         ※需要スコアは札幌市内エリアのみ対象の推定値です
       </p>
     </div>
@@ -144,28 +144,28 @@ function TimeSlotSection({
   return (
     <div
       className={`rounded-xl p-3 ${
-        isCurrent ? "bg-amber-50 ring-2 ring-amber-400" : "bg-white ring-1 ring-slate-200"
+        isCurrent ? "bg-warm-soft ring-2 ring-[var(--warm)]" : "bg-surface-elevated ring-1 ring-border-soft"
       }`}
     >
-      <h3 className="mb-2 text-sm font-bold text-slate-800">
+      <h3 className="mb-2 text-sm font-bold text-[var(--foreground)]">
         {TIME_SLOT_LABELS[slot]}
         {isCurrent && (
-          <span className="ml-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs text-white">
+          <span className="ml-2 rounded-full bg-accent px-2 py-0.5 text-xs text-white">
             現在
           </span>
         )}
       </h3>
-      <ol className="mb-2 space-y-1 text-sm text-slate-700">
+      <ol className="mb-2 space-y-1 text-sm text-[var(--foreground-muted)]">
         {areas.map((a, i) => (
           <li key={a.area.id}>
             {i + 1}. {a.area.name}
-            <span className="ml-1 text-slate-400">({a.score}点)</span>
+            <span className="ml-1 text-subtle">({a.score}点)</span>
           </li>
         ))}
       </ol>
       {top && (
-        <div className="border-t border-slate-200 pt-2">
-          <p className="mb-1 text-xs font-semibold text-slate-500">
+        <div className="border-t border-border-soft pt-2">
+          <p className="mb-1 text-xs font-semibold text-muted">
             1位 {top.area.name} の需要パターン
           </p>
           <ReasonList reasons={top.reasonDetails} compact />

@@ -63,9 +63,9 @@ export function CalendarView() {
   }
 
   const demandColors = {
-    high: "bg-amber-400",
-    medium: "bg-sky-300",
-    low: "bg-slate-200",
+    high: "bg-[var(--demand-high)]",
+    medium: "bg-[var(--demand-medium)]",
+    low: "bg-[var(--demand-low)]",
   };
 
   return (
@@ -74,7 +74,7 @@ export function CalendarView() {
         <button
           type="button"
           onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-          className="rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100"
+          className="rounded-lg px-3 py-2 text-muted hover:bg-surface"
         >
           ←
         </button>
@@ -84,13 +84,13 @@ export function CalendarView() {
         <button
           type="button"
           onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-          className="rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100"
+          className="rounded-lg px-3 py-2 text-muted hover:bg-surface"
         >
           →
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-500">
+      <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-muted">
         {WEEKDAYS.map((d) => (
           <div key={d} className="py-1">
             {d}
@@ -114,12 +114,12 @@ export function CalendarView() {
               onClick={() => setSelectedDate(dateStr)}
               className={`flex min-h-14 flex-col items-center justify-center rounded-xl p-1 text-sm ${
                 selected
-                  ? "bg-amber-100 ring-2 ring-amber-500"
-                  : "hover:bg-slate-50"
+                  ? "bg-warm-soft ring-2 ring-[var(--warm)]"
+                  : "hover:bg-surface"
               } ${!inMonth ? "opacity-30" : ""}`}
             >
               <span
-                className={`font-medium ${isToday ? "text-amber-600" : "text-slate-800"}`}
+                className={`font-medium ${isToday ? "text-accent-text" : "text-[var(--foreground)]"}`}
               >
                 {format(day, "d")}
               </span>
@@ -134,19 +134,19 @@ export function CalendarView() {
         })}
       </div>
 
-      <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+      <div className="rounded-2xl bg-surface-elevated p-4 ring-1 ring-border-soft">
         <h3 className="mb-2 text-lg font-bold">
           {format(parseISO(selectedDate), "M月d日(E)の詳細", { locale: ja })}
         </h3>
         {loading ? (
-          <p className="text-sm text-slate-500">読み込み中...</p>
+          <p className="text-sm text-muted">読み込み中...</p>
         ) : detail ? (
           <div className="space-y-4">
             {detail.demandOverview && (
-              <div className="rounded-lg bg-slate-50 p-3">
-                <p className="mb-1 text-xs font-semibold text-slate-500">需要概要</p>
+              <div className="rounded-lg bg-surface p-3">
+                <p className="mb-1 text-xs font-semibold text-muted">需要概要</p>
                 {detail.demandOverview.split("\n").map((line) => (
-                  <p key={line} className="text-sm text-slate-700">
+                  <p key={line} className="text-sm text-[var(--foreground-muted)]">
                     {line}
                   </p>
                 ))}
@@ -157,9 +157,9 @@ export function CalendarView() {
                 <p className="mb-1 text-sm font-semibold">イベント</p>
                 <ul className="space-y-2">
                   {detail.events.map((e) => (
-                    <li key={e.id} className="rounded-lg bg-violet-50 p-2 text-sm text-violet-800">
+                    <li key={e.id} className="rounded-lg bg-event-soft p-2 text-sm text-event-text">
                       <p className="font-medium">{e.title}</p>
-                      <p className="text-xs text-violet-600">
+                      <p className="text-xs text-[var(--foreground-muted)]">
                         想定{e.estimatedAttendance.toLocaleString()}人
                         {e.peakHours?.length
                           ? ` / ピーク${e.peakHours[0]}〜${e.peakHours[e.peakHours.length - 1]}時`
@@ -176,11 +176,11 @@ export function CalendarView() {
                 {detail.topAreas.map((a, i) => (
                   <div
                     key={a.area.id}
-                    className="rounded-lg border border-slate-100 bg-slate-50 p-3"
+                    className="rounded-lg border border-border-soft bg-surface p-3"
                   >
-                    <p className="text-sm font-bold">
+                    <p className="text-sm font-bold text-[var(--foreground)]">
                       {i + 1}. {a.area.name}
-                      <span className="ml-2 font-normal text-slate-500">
+                      <span className="ml-2 font-normal text-muted">
                         スコア {a.score}
                       </span>
                     </p>
@@ -197,7 +197,7 @@ export function CalendarView() {
 
       <Link
         href="/log/history"
-        className="block rounded-xl bg-slate-100 px-4 py-3 text-center text-sm font-medium text-slate-700"
+        className="block rounded-xl bg-surface px-4 py-3 text-center text-sm font-medium text-muted"
       >
         過去の稼働記録を見る →
       </Link>

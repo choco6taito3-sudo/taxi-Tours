@@ -2,22 +2,90 @@
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  --background: #f1f5f9;
-  --foreground: #0f172a;
+  /* 目に優しいウォームニュートラル配色 */
+  --bg: #e8e4de;
+  --surface: #f5f2ec;
+  --surface-elevated: #faf8f4;
+  --foreground: #3a3835;
+  --foreground-muted: #6f6a63;
+  --foreground-subtle: #9a948c;
+  --border: #d8d2c8;
+  --border-soft: #e8e3db;
+
+  --accent: #6d8f75;
+  --accent-hover: #5a7a62;
+  --accent-soft: #dce8df;
+  --accent-text: #4a6b52;
+
+  --warm: #b8956b;
+  --warm-soft: #ede4d6;
+  --warm-text: #7a6348;
+
+  --info-soft: #dde6ec;
+  --info-text: #5a7080;
+
+  --event-soft: #e8e0ec;
+  --event-text: #6a5f75;
+
+  --success: #6d8f75;
+  --success-soft: #dce8df;
+  --success-text: #4a6b52;
+
+  --danger-soft: #ecdfdf;
+  --danger-text: #8a6060;
+
+  --demand-high: #c9a88a;
+  --demand-high-soft: #f0e8df;
+  --demand-medium: #9bb5c4;
+  --demand-medium-soft: #e4edf2;
+  --demand-low: #d5d0c8;
+  --demand-low-soft: #edeae5;
+
+  --nav-bg: rgba(250, 248, 244, 0.95);
 }
 
 @theme inline {
-  --color-background: var(--background);
+  --color-background: var(--bg);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-noto-sans), system-ui, sans-serif;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-muted: var(--foreground-muted);
+  --color-subtle: var(--foreground-subtle);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-text: var(--accent-text);
+  --color-warm: var(--warm);
+  --color-warm-soft: var(--warm-soft);
+  --color-warm-text: var(--warm-text);
+  --color-info-soft: var(--info-soft);
+  --color-info-text: var(--info-text);
+  --color-event-soft: var(--event-soft);
+  --color-event-text: var(--event-text);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-text: var(--success-text);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-text: var(--danger-text);
 }
 
 body {
-  background: var(--background);
+  background: var(--bg);
   color: var(--foreground);
   font-family: var(--font-sans);
 }
 
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* カード共通 */
+.card {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 1rem;
 }

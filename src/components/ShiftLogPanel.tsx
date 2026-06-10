@@ -15,6 +15,8 @@ import {
   getJSTDateString,
 } from "@/lib/utils/datetime";
 
+const CARD = "rounded-2xl bg-surface-elevated p-4 ring-1 ring-border-soft";
+
 export function ShiftLogPanel() {
   const today = getJSTDateString();
   const [shift, setShift] = useState<WorkShift | null>(null);
@@ -136,7 +138,7 @@ export function ShiftLogPanel() {
         onClick={() =>
           pending ? handleDropoff(areaId) : handlePickup(areaId)
         }
-        className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-sm font-semibold text-amber-900 active:bg-amber-100 disabled:opacity-40"
+        className="rounded-xl border border-border bg-warm-soft px-3 py-3 text-sm font-semibold text-warm-text active:bg-[var(--demand-high-soft)] disabled:opacity-40"
       >
         {name}
       </button>
@@ -145,21 +147,21 @@ export function ShiftLogPanel() {
 
   return (
     <div className="space-y-4">
-      <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-        <h2 className="mb-3 text-lg font-bold">勤務記録</h2>
-        <p className="mb-3 text-sm text-slate-500">
+      <section className={CARD}>
+        <h2 className="mb-3 text-lg font-bold text-[var(--foreground)]">勤務記録</h2>
+        <p className="mb-3 text-sm text-muted">
           {format(parseISO(today), "yyyy年M月d日(E)", { locale: ja })} / 稼働{" "}
           {getOperatingHoursLabel()}（日本時間）
         </p>
 
         {isOnDuty && (
-          <p className="mb-3 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">
+          <p className="mb-3 rounded-lg bg-success-soft px-3 py-2 text-sm font-medium text-success-text">
             出勤中
             {shift?.startedAt && `（開始 ${formatJSTTime(shift.startedAt)}）`}
           </p>
         )}
         {isFinished && (
-          <p className="mb-3 rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">
+          <p className="mb-3 rounded-lg bg-[var(--demand-low-soft)] px-3 py-2 text-sm text-muted">
             本日の勤務は終了しています
             {shift?.startedAt && shift?.endedAt &&
               `（${formatJSTTime(shift.startedAt)}〜${formatJSTTime(shift.endedAt)}）`}
@@ -171,7 +173,7 @@ export function ShiftLogPanel() {
             type="button"
             disabled={loading || isOnDuty}
             onClick={() => handleShiftAction("start")}
-            className="flex-1 rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white disabled:opacity-40"
+            className="flex-1 rounded-xl bg-accent px-4 py-3 font-semibold text-white disabled:opacity-40"
           >
             {isOnDuty ? "出勤済み" : isFinished ? "再出勤" : "出勤"}
           </button>
@@ -179,25 +181,25 @@ export function ShiftLogPanel() {
             type="button"
             disabled={loading || !isOnDuty}
             onClick={() => handleShiftAction("end")}
-            className="flex-1 rounded-xl bg-slate-700 px-4 py-3 font-semibold text-white disabled:opacity-40"
+            className="flex-1 rounded-xl bg-[var(--foreground-muted)] px-4 py-3 font-semibold text-white disabled:opacity-40"
           >
             退勤
           </button>
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-        <h2 className="mb-1 text-lg font-bold">
+      <section className={CARD}>
+        <h2 className="mb-1 text-lg font-bold text-[var(--foreground)]">
           {pending ? "下車エリアを選択" : "乗車エリアを選択"}
         </h2>
-        <p className="mb-3 text-xs text-slate-500">札幌市内のみ（{allCityAreas.length}エリア）</p>
+        <p className="mb-3 text-xs text-muted">札幌市内のみ（{allCityAreas.length}エリア）</p>
         <div className="grid grid-cols-2 gap-2">
           {popularAreas.map((area) => renderAreaButton(area.id, area.name))}
         </div>
         <button
           type="button"
           onClick={() => setShowAllAreas(!showAllAreas)}
-          className="mt-3 w-full rounded-lg bg-slate-100 py-2 text-sm font-medium text-slate-700"
+          className="mt-3 w-full rounded-lg bg-surface py-2 text-sm font-medium text-muted"
         >
           {showAllAreas ? "その他のエリアを閉じる" : `その他の市内エリアを表示（${otherAreas.length}件）`}
         </button>
@@ -206,40 +208,40 @@ export function ShiftLogPanel() {
             {otherAreas.map((area) => renderAreaButton(area.id, area.name))}
           </div>
         )}
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-xs text-subtle">
           天候・イベントは記録時に自動保存されます
         </p>
       </section>
 
       {message && (
-        <p className="rounded-xl bg-sky-50 px-4 py-2 text-sm text-sky-800">
+        <p className="rounded-xl bg-info-soft px-4 py-2 text-sm text-info-text">
           {message}
         </p>
       )}
       {error && (
-        <p className="rounded-xl bg-red-50 px-4 py-2 text-sm text-red-800">
+        <p className="rounded-xl bg-danger-soft px-4 py-2 text-sm text-danger-text">
           {error}
         </p>
       )}
 
-      <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-        <h2 className="mb-3 text-lg font-bold">本日の記録 ({rides.length}件)</h2>
+      <section className={CARD}>
+        <h2 className="mb-3 text-lg font-bold text-[var(--foreground)]">本日の記録 ({rides.length}件)</h2>
         {rides.length === 0 ? (
-          <p className="text-sm text-slate-500">まだ記録がありません</p>
+          <p className="text-sm text-muted">まだ記録がありません</p>
         ) : (
           <ul className="space-y-2">
             {rides.map((ride) => (
               <li
                 key={ride.id}
-                className="rounded-xl border border-slate-100 bg-slate-50 p-3 text-sm"
+                className="rounded-xl border border-border-soft bg-surface p-3 text-sm"
               >
-                <p className="font-medium">
+                <p className="font-medium text-[var(--foreground)]">
                   {getAreaName(ride.pickupAreaId)}
                   {ride.droppedOffAt
                     ? ` → ${getAreaName(ride.dropoffAreaId)}`
                     : " → 乗車中"}
                 </p>
-                <p className="text-slate-500">
+                <p className="text-muted">
                   {formatJSTTime(ride.pickedUpAt)}
                   {ride.droppedOffAt &&
                     ` - ${formatJSTTime(ride.droppedOffAt)}`}

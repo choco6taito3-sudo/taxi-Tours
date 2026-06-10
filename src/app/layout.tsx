@@ -24,7 +24,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#f59e0b",
+  themeColor: "#e8e4de",
 };
 
 export default function RootLayout({
@@ -34,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className={`${notoSans.variable} h-full`}>
-      <body className="min-h-full bg-slate-100 font-sans text-slate-900 antialiased">
+      <body className="min-h-full bg-bg font-sans text-[var(--foreground)] antialiased">
         <main className="mx-auto min-h-full max-w-lg px-4 pb-24 pt-4">
           {children}
         </main>

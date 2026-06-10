@@ -4,8 +4,8 @@
   "description": "天気・イベント連動の売上提案と稼働記録（札幌市）",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f1f5f9",
-  "theme_color": "#f59e0b",
+  "background_color": "#e8e4de",
+  "theme_color": "#e8e4de",
   "orientation": "portrait",
   "lang": "ja",
   "icons": []
