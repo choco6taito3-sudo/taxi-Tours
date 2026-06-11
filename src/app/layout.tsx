@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_JP } from "next/font/google";
 import { BottomNav } from "@/components/BottomNav";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 const notoSans = Noto_Sans_JP({
@@ -17,6 +18,10 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "default",
     title: "タクシー売上UP",
+  },
+  icons: {
+    icon: "/icons/icon.svg",
+    apple: "/icons/icon.svg",
   },
 };
 
@@ -39,6 +44,7 @@ export default function RootLayout({
           {children}
         </main>
         <BottomNav />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

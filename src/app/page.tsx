@@ -15,6 +15,7 @@ import {
 } from "@/lib/operating-hours";
 import { getRecommendationsForDay } from "@/lib/scoring/engine";
 import { getJSTDateString, getJSTHour } from "@/lib/utils/datetime";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import { ReasonList } from "@/components/ReasonList";
 import type { AreaRecommendation, TimeSlot } from "@/lib/types";
 
@@ -52,6 +53,8 @@ export default async function HomePage() {
           {getOperatingHoursLabel()}（日本時間）
         </p>
       </header>
+
+      <InstallPrompt />
 
       <WeatherBadge weather={weather} />
 

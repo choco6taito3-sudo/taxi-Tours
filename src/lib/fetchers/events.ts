@@ -1,6 +1,14 @@
 import { format, parseISO } from "date-fns";
 import recurringData from "../../../data/recurring_events.json";
 import type { Event, RecurringEventTemplate } from "../types";
+import {
+  fetchSapporoTravelEvents,
+  filterTravelEventsForDate,
+} from "./sapporo-travel";
+import {
+  fetchSapporoRssEvents,
+  filterRssEventsForDate,
+} from "./sapporo-rss";
 
 const RECURRING = recurringData as RecurringEventTemplate[];
 
@@ -18,7 +26,6 @@ function isDateInRecurringRange(
     return true;
   }
 
-  // 年をまたぐ（例: 11月〜3月）
   if (month > monthStart || month < monthEnd) return true;
   if (month === monthStart && day >= dayStart) return true;
   if (month === monthEnd && day <= dayEnd) return true;
@@ -44,14 +51,60 @@ export function getRecurringEventsForDate(dateStr: string): Event[] {
       estimatedAttendance: t.estimatedAttendance,
       peakHours: t.peakHours,
       source: "recurring",
+      sourceLabel: "定例イベント",
     }),
   );
+}
+
+function normalizeTitle(title: string): string {
+  return title
+    .replace(/\s+/g, "")
+    .replace(/[Ａ-Ｚａ-ｚ０-９]/g, (c) =>
+      String.fromCharCode(c.charCodeAt(0) - 0xfee0),
+    )
+    .toLowerCase();
+}
+
+function mergeEvents(lists: Event[][]): Event[] {
+  const seen = new Set<string>();
+  const merged: Event[] = [];
+
+  for (const list of lists) {
+    for (const event of list) {
+      const key = normalizeTitle(event.title);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      merged.push(event);
+    }
+  }
+
+  return merged.sort(
+    (a, b) => b.estimatedAttendance - a.estimatedAttendance,
+  );
+}
+
+export async function fetchEventsForDate(dateStr: string): Promise<Event[]> {
+  const [travelAll, rssAll] = await Promise.all([
+    fetchSapporoTravelEvents(),
+    fetchSapporoRssEvents(),
+  ]);
+
+  return mergeEvents([
+    getRecurringEventsForDate(dateStr),
+    filterTravelEventsForDate(travelAll, dateStr),
+    filterRssEventsForDate(rssAll, dateStr),
+  ]);
 }
 
 export async function fetchEventsForDateRange(
   startDate: string,
   endDate: string,
 ): Promise<Event[]> {
+  const [travelAll, rssAll] = await Promise.all([
+    fetchSapporoTravelEvents(),
+    fetchSapporoRssEvents(),
+  ]);
+
   const events: Event[] = [];
   const start = parseISO(startDate);
   const end = parseISO(endDate);
@@ -59,15 +112,23 @@ export async function fetchEventsForDateRange(
 
   while (current <= end) {
     const dateStr = format(current, "yyyy-MM-dd");
-    events.push(...getRecurringEventsForDate(dateStr));
+    events.push(
+      ...mergeEvents([
+        getRecurringEventsForDate(dateStr),
+        filterTravelEventsForDate(travelAll, dateStr),
+        filterRssEventsForDate(rssAll, dateStr),
+      ]),
+    );
     current.setDate(current.getDate() + 1);
   }
 
-  return events;
-}
-
-export async function fetchEventsForDate(dateStr: string): Promise<Event[]> {
-  return getRecurringEventsForDate(dateStr);
+  const seen = new Set<string>();
+  return events.filter((e) => {
+    const key = `${e.id}-${e.startAt.slice(0, 10)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 export function getEventCategoryLabel(category: string): string {
@@ -81,4 +142,13 @@ export function getEventCategoryLabel(category: string): string {
     other: "その他",
   };
   return labels[category] ?? category;
+}
+
+export function getEventSourceLabel(source: string): string {
+  const labels: Record<string, string> = {
+    recurring: "定例",
+    "sapporo-travel": "ようこそさっぽろ",
+    "sapporo-rss": "札幌市",
+  };
+  return labels[source] ?? source;
 }

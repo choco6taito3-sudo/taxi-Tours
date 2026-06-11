@@ -8,5 +8,12 @@
   "theme_color": "#e8e4de",
   "orientation": "portrait",
   "lang": "ja",
-  "icons": []
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }

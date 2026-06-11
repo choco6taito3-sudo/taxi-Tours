@@ -58,6 +58,8 @@ export interface Event {
   estimatedAttendance: number;
   peakHours?: number[];
   source: string;
+  link?: string;
+  sourceLabel?: string;
 }
 
 export type DemandReasonCategory =

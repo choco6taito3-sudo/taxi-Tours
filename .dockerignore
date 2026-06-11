@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.gitignore
+data/taxi-tool.db
+data/taxi-tool.db-*
+data/backups
+.env*
+taxi-Tours
+scripts/cloudflared
+*.md
+.DS_Store

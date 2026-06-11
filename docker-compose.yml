@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      ACCESS_PIN: ${ACCESS_PIN:-7294}
+      DATA_DIR: /app/data
+    volumes:
+      - taxi-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  taxi-data:
