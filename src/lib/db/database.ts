@@ -61,12 +61,23 @@ function initSchema(database: Database.Database) {
 
 export function getDb(): Database.Database {
   if (!db) {
-    if (!fs.existsSync(DB_DIR)) {
-      fs.mkdirSync(DB_DIR, { recursive: true });
+    try {
+      if (!fs.existsSync(DB_DIR)) {
+        fs.mkdirSync(DB_DIR, { recursive: true });
+      }
+      db = new Database(DB_PATH);
+      db.pragma("journal_mode = WAL");
+      initSchema(db);
+    } catch (error) {
+      const hint =
+        error instanceof Error && /EACCES|readonly|SQLITE_CANTOPEN/i.test(error.message)
+          ? "（Volumeの書き込み権限を確認してください: DATA_DIR=/app/data）"
+          : "";
+      throw new Error(
+        `データベースを開けません: ${DB_PATH}${hint}`,
+        { cause: error },
+      );
     }
-    db = new Database(DB_PATH);
-    db.pragma("journal_mode = WAL");
-    initSchema(db);
   }
   return db;
 }

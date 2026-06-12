@@ -15,6 +15,8 @@
 | `ACCESS_PIN` | あなたのPIN（例: 7294） |
 | `DATA_DIR` | `/app/data` |
 
+※ Volume の Mount Path も `/app/data` にすること（必須）
+
 ## 4. Volume（必須・稼働記録の永続化）
 
 1. サービス → **Volumes** → **Add Volume**

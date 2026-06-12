@@ -1,4 +1,4 @@
-const CACHE = "taxi-tool-v1";
+const CACHE = "taxi-tool-v2";
 const PRECACHE = ["/", "/manifest.json"];
 
 self.addEventListener("install", (event) => {

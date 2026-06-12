@@ -10,6 +10,7 @@ import {
 } from "@/lib/areas";
 import { getOperatingHoursLabel } from "@/lib/operating-hours";
 import type { RideLog, WorkShift } from "@/lib/types";
+import { apiFetch } from "@/lib/utils/api-fetch";
 import {
   formatJSTTime,
   getJSTDateString,
@@ -43,9 +44,11 @@ export function ShiftLogPanel() {
   const loadData = useCallback(async () => {
     setError("");
     try {
-      const res = await fetch(`/api/rides?date=${today}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "データ取得に失敗しました");
+      const data = await apiFetch<{
+        shift: WorkShift | null;
+        rides: RideLog[];
+        pending: RideLog | null;
+      }>(`/api/rides?date=${today}`);
       setShift(data.shift ?? null);
       setRides(data.rides ?? []);
       setPending(data.pending ?? null);
@@ -63,13 +66,10 @@ export function ShiftLogPanel() {
     setMessage("");
     setError("");
     try {
-      const res = await fetch("/api/shifts", {
+      const data = await apiFetch<{ shift: WorkShift }>("/api/shifts", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, date: today }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
       setShift(data.shift);
       await loadData();
       setMessage(
@@ -87,13 +87,10 @@ export function ShiftLogPanel() {
     setMessage("");
     setError("");
     try {
-      const res = await fetch("/api/rides", {
+      await apiFetch("/api/rides", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "pickup", date: today, pickupAreaId: areaId }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
       await loadData();
       setMessage(`${getAreaName(areaId)}で乗車を記録しました`);
     } catch (e) {
@@ -109,17 +106,14 @@ export function ShiftLogPanel() {
     setMessage("");
     setError("");
     try {
-      const res = await fetch("/api/rides", {
+      await apiFetch("/api/rides", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "dropoff",
           rideId: pending.id,
           dropoffAreaId: areaId,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
       await loadData();
       setMessage(`${getAreaName(areaId)}で下車を記録しました`);
     } catch (e) {
@@ -168,6 +162,9 @@ export function ShiftLogPanel() {
           </p>
         )}
 
+        {loading && (
+          <p className="mb-2 text-center text-xs text-muted">処理中...</p>
+        )}
         <div className="flex gap-2">
           <button
             type="button"
@@ -175,7 +172,7 @@ export function ShiftLogPanel() {
             onClick={() => handleShiftAction("start")}
             className="flex-1 rounded-xl bg-accent px-4 py-3 font-semibold text-white disabled:opacity-40"
           >
-            {isOnDuty ? "出勤済み" : isFinished ? "再出勤" : "出勤"}
+            {loading ? "..." : isOnDuty ? "出勤済み" : isFinished ? "再出勤" : "出勤"}
           </button>
           <button
             type="button"
@@ -183,7 +180,7 @@ export function ShiftLogPanel() {
             onClick={() => handleShiftAction("end")}
             className="flex-1 rounded-xl bg-[var(--foreground-muted)] px-4 py-3 font-semibold text-white disabled:opacity-40"
           >
-            退勤
+            {loading ? "..." : "退勤"}
           </button>
         </div>
       </section>
