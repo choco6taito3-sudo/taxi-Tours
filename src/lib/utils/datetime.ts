@@ -1,6 +1,23 @@
 const JST_TIMEZONE = "Asia/Tokyo";
 
 /** 札幌向けアプリは常に日本時間（JST）で判定する */
+export function getJSTWeekday(date = new Date()): number {
+  const wd = new Intl.DateTimeFormat("en-US", {
+    timeZone: JST_TIMEZONE,
+    weekday: "short",
+  }).format(date);
+  const map: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  };
+  return map[wd] ?? 0;
+}
+
 export function getJSTHour(date = new Date()): number {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: JST_TIMEZONE,

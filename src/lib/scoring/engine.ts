@@ -24,6 +24,13 @@ import {
   mergeReasons,
   reasonsToStrings,
 } from "./reasons";
+import {
+  buildHistoryOverview,
+  buildHistoryReason,
+  getHistoryBoost,
+  type HistoryPatternModel,
+} from "./history";
+import { getJSTWeekday } from "../utils/datetime";
 
 export { getCurrentTimeSlot };
 
@@ -161,12 +168,16 @@ function buildReasonDetails(
   events: Event[],
   slot: TimeSlot,
   dateStr: string,
+  history?: HistoryPatternModel | null,
 ): DemandReason[] {
   const date = parseISO(dateStr);
   const dayOfWeek = getDay(date);
   const month = date.getMonth() + 1;
+  const jstWeekday = getJSTWeekday(date);
 
   const areaReason = buildAreaReason(area);
+  const historyReason =
+    history && buildHistoryReason(area.id, slot, jstWeekday, history);
 
   return mergeReasons(
     buildWeatherReasons(area, weather),
@@ -175,6 +186,7 @@ function buildReasonDetails(
     buildWeekdayReasons(area, dayOfWeek),
     buildSeasonReasons(area, month),
     areaReason ? [areaReason] : [],
+    historyReason ? [historyReason] : [],
   );
 }
 
@@ -184,19 +196,31 @@ export function scoreArea(
   events: Event[],
   slot: TimeSlot,
   dateStr: string,
+  history?: HistoryPatternModel | null,
 ): AreaRecommendation {
   const date = parseISO(dateStr);
   const dayOfWeek = getDay(date);
   const month = date.getMonth() + 1;
+  const jstWeekday = getJSTWeekday(date);
 
   let score = area.baseWeight * 0.5;
   score += getTimeSlotBoost(area, slot, dayOfWeek);
   score += getWeatherBoost(area, weather);
   score += getEventBoost(area, events, slot);
   score += getSeasonBoost(area, month);
+  if (history) {
+    score += getHistoryBoost(area.id, slot, jstWeekday, history);
+  }
   score = Math.min(100, Math.max(0, Math.round(score)));
 
-  const reasonDetails = buildReasonDetails(area, weather, events, slot, dateStr);
+  const reasonDetails = buildReasonDetails(
+    area,
+    weather,
+    events,
+    slot,
+    dateStr,
+    history,
+  );
 
   return {
     area,
@@ -224,6 +248,7 @@ export function getRecommendationsForDay(
   weather: DailyWeather,
   events: Event[],
   currentHour?: number,
+  history?: HistoryPatternModel | null,
 ): {
   topAreas: AreaRecommendation[];
   timeSlotAreas: Record<TimeSlot, AreaRecommendation[]>;
@@ -237,7 +262,7 @@ export function getRecommendationsForDay(
 
   for (const slot of ALL_TIME_SLOTS) {
     const allScored = SAPPORO_CITY_AREAS.map((area) =>
-      scoreArea(area, weather, events, slot, dateStr),
+      scoreArea(area, weather, events, slot, dateStr, history),
     ).sort((a, b) => b.score - a.score);
     allAreasBySlot[slot] = allScored;
     timeSlotAreas[slot] = allScored.slice(0, 5);
@@ -264,6 +289,10 @@ export function getRecommendationsForDay(
   if (events.length > 0) {
     demandOverview += `\n【イベント】${buildDayEventSummary(events)}`;
     demandOverview += " → 会場終了後の繁華街・駅方面に需要集中の可能性";
+  }
+
+  if (history) {
+    demandOverview += `\n${buildHistoryOverview(history)}`;
   }
 
   let summary = demandOverview.replace("\n", "。");

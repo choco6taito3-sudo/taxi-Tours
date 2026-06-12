@@ -31,6 +31,7 @@ const CATEGORY_LABELS: Record<DemandReasonCategory, string> = {
   weekday: "曜日",
   season: "季節",
   area: "エリア特性",
+  history: "実績",
 };
 
 export function getCategoryLabel(category: DemandReasonCategory): string {

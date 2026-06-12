@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { fetchEventsForDate } from "@/lib/fetchers/events";
 import { fetchWeatherForecast } from "@/lib/fetchers/weather";
 import { getRecommendationsForDay } from "@/lib/scoring/engine";
+import { buildRidePatternModel } from "@/lib/scoring/history";
 import type { DayRecommendation } from "@/lib/types";
 import { getJSTDateString, getJSTHour } from "@/lib/utils/datetime";
 
@@ -25,8 +26,9 @@ export async function GET(request: Request) {
     const isToday = date === getJSTDateString();
     const currentHour = isToday ? getJSTHour() : undefined;
 
+    const history = buildRidePatternModel();
     const { topAreas, timeSlotAreas, currentSlot, summary, demandOverview } =
-      getRecommendationsForDay(date, weather, events, currentHour);
+      getRecommendationsForDay(date, weather, events, currentHour, history);
 
     const result: DayRecommendation = {
       date,

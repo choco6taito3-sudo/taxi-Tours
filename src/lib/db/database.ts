@@ -263,6 +263,34 @@ export function getShiftHistory(limit = 30): WorkShift[] {
   }));
 }
 
+export function getRecentRidePickups(lookbackDays = 90): Array<{
+  pickupAreaId: string;
+  pickedUpAt: string;
+  fareAmount: number | null;
+}> {
+  const cutoffMs = Date.now() - lookbackDays * 24 * 60 * 60 * 1000;
+  const rows = getDb()
+    .prepare(
+      `SELECT pickup_area_id, picked_up_at, fare_amount
+       FROM ride_logs
+       WHERE pickup_area_id IS NOT NULL AND pickup_area_id != ''
+       ORDER BY picked_up_at DESC`,
+    )
+    .all() as Array<{
+      pickup_area_id: string;
+      picked_up_at: string;
+      fare_amount: number | null;
+    }>;
+
+  return rows
+    .filter((r) => new Date(r.picked_up_at).getTime() >= cutoffMs)
+    .map((r) => ({
+      pickupAreaId: r.pickup_area_id,
+      pickedUpAt: r.picked_up_at,
+      fareAmount: r.fare_amount,
+    }));
+}
+
 export function getExportData(startDate: string, endDate: string) {
   return getDb()
     .prepare(

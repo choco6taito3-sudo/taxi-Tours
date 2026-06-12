@@ -8,6 +8,7 @@ const CATEGORY_STYLES: Record<string, string> = {
   weekday: "bg-success-soft text-success-text",
   season: "bg-[var(--demand-high-soft)] text-warm-text",
   area: "bg-[var(--demand-low-soft)] text-muted",
+  history: "bg-accent-soft text-accent-text",
 };
 
 export function ReasonList({

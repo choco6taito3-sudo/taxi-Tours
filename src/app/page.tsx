@@ -14,6 +14,7 @@ import {
   isWithinOperatingHours,
 } from "@/lib/operating-hours";
 import { getRecommendationsForDay } from "@/lib/scoring/engine";
+import { buildRidePatternModel } from "@/lib/scoring/history";
 import { getJSTDateString, getJSTHour } from "@/lib/utils/datetime";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { ReasonList } from "@/components/ReasonList";
@@ -32,11 +33,13 @@ export default async function HomePage() {
   ]);
 
   const weather = daily.find((d) => d.date === today) ?? daily[0];
+  const history = buildRidePatternModel();
   const { timeSlotAreas, summary, demandOverview } = getRecommendationsForDay(
     today,
     weather,
     events,
     currentHour,
+    history,
   );
 
   const currentSlotAreas = currentSlot

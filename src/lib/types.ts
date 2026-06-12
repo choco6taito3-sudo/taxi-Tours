@@ -68,7 +68,8 @@ export type DemandReasonCategory =
   | "timeslot"
   | "weekday"
   | "season"
-  | "area";
+  | "area"
+  | "history";
 
 export interface DemandReason {
   category: DemandReasonCategory;
